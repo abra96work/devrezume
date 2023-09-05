@@ -45,18 +45,14 @@ def get_surname(message):
     bot.send_message(message.from_user.id, 'Сколько тебе лет?')
     bot.register_next_step_handler(message, get_age);
 
-
+@bot.message_handler(commands=['button'])
 def get_age(message):
     global age;
     while age == 0:
         try:
             age = int(message.text)
-            bot.register_next_step_handler(message, button_quest);
         except Exception:
             bot.send_message(message.from_user.id, 'Введи числоовое значение')
-
-@bot.message_handler(commands=['button'])
-def button_quest(message):
     keyboard = types.InlineKeyboardMarkup();
     key_yes = types.InlineKeyboardButton(text='Да', callback_data='yes');
     keyboard.add(key_yes);
@@ -68,5 +64,19 @@ def button_quest(message):
         bot.send_message(message.from_user.id, 'Запомню')
     elif call.data == 'no':
         start()
+
+# @bot.message_handler(commands=['button'])
+# def button_quest(message):
+#     keyboard = types.InlineKeyboardMarkup();
+#     key_yes = types.InlineKeyboardButton(text='Да', callback_data='yes');
+#     keyboard.add(key_yes);
+#     key_no = types.InlineKeyboardButton(text='Нет', callback_data='no');
+#     keyboard.add(key_no);
+#     question = 'Тебе {age} лет, тебя зовут {name} {surname}?'
+#     bot.send_message(message.from_user.id, text=question, reply_markup=keyboard)
+#     if call.data == 'yes':
+#         bot.send_message(message.from_user.id, 'Запомню')
+#     elif call.data == 'no':
+#         start()
 
 bot.polling(non_stop=True, interval=0)
