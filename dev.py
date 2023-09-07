@@ -17,14 +17,14 @@ bot = telebot.TeleBot('6467407681:AAF37eHg6bAY6-v90GhmlxQDg3YqD3n-XXQ')
 name = ''
 surname = ''
 age = 0
-
-@bot.message_handler(commands=['button'])
-def welcome(message):
-    keyboard_start = types.InlineKeyboardMarkup()
-    key_start = types.InlineKeyboardButton(text='Начать работу', callback_data='start')
-    keyboard_start.add(key_start)
-    if callback_data == 'start':
-        start()
+#
+# @bot.message_handler(commands=['button'])
+# def welcome(message):
+#     keyboard_start = types.InlineKeyboardMarkup()
+#     key_start = types.InlineKeyboardButton(text='Начать работу', callback_data='start')
+#     keyboard_start.add(key_start)
+#     if callback_data == 'start':
+#         start()
 
 @bot.message_handler(content_types = ['text'])
 def start(message):
@@ -49,16 +49,13 @@ def get_surname(message):
 
 def get_age(message):
     global age
-    while age == 0:
-        try:
-            age = int(message.text)
-        except Exception:
-            bot.send_message(message.from_user.id, 'Введи числоовое значение')
+    age = int(message.text)
+    # bot.register_next_step_handler(message, button_quest)
     keyboard = types.InlineKeyboardMarkup()
     key_yes = types.InlineKeyboardButton(text='Да', callback_data='yes')
-    keyboard.add(key_yes)
-    key_no = types.InlineKeyboardButton(text='Нет', callback_data='no')
-    keyboard.add(key_no)
+    keyboard.add(key_yes);
+    key_no = types.InlineKeyboardButton(text='Нет', callback_data='no');
+    keyboard.add(key_no);
     question = 'Тебе {age} лет, тебя зовут {name} {surname}?'
     bot.send_message(message.from_user.id, text=question, reply_markup=keyboard)
     if callback_data == 'yes':
@@ -68,16 +65,6 @@ def get_age(message):
 
 # @bot.message_handler(commands=['button'])
 # def button_quest(message):
-#     keyboard = types.InlineKeyboardMarkup();
-#     key_yes = types.InlineKeyboardButton(text='Да', callback_data='yes');
-#     keyboard.add(key_yes);
-#     key_no = types.InlineKeyboardButton(text='Нет', callback_data='no');
-#     keyboard.add(key_no);
-#     question = 'Тебе {age} лет, тебя зовут {name} {surname}?'
-#     bot.send_message(message.from_user.id, text=question, reply_markup=keyboard)
-#     if call.data == 'yes':
-#         bot.send_message(message.from_user.id, 'Запомню')
-#     elif call.data == 'no':
-#         start()
+#
 
 bot.polling(non_stop=True, interval=0)
