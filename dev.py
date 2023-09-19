@@ -4,36 +4,21 @@ from telebot import callback_data
 
 bot = telebot.TeleBot('6467407681:AAF37eHg6bAY6-v90GhmlxQDg3YqD3n-XXQ')
 
-# @bot.message_handler(content_types=['text'])
-# def get_text_message(message):
-#     if message.text == 'Привет':
-#         bot.send_message(message.from_user.id, 'Для старта работы напиши /reg')
-#     elif message.text == '/help':
-#         bot.send_message(message.from_user.id, 'Напиши "Привет"')
-#     else:
-#         bot.send_message(message.from_user.id, 'Я тебя не понимаю, напиши "Привет"')
-
-
 name = ''
 surname = ''
 age = 0
-#
-# @bot.message_handler(commands=['button'])
-# def welcome(message):
-#     keyboard_start = types.InlineKeyboardMarkup()
-#     key_start = types.InlineKeyboardButton(text='Начать работу', callback_data='start')
-#     keyboard_start.add(key_start)
-#     if callback_data == 'start':
-#         start()
+photo_us = ''
 
-@bot.message_handler(content_types = ['text'])
+
+@bot.message_handler(content_types=['text'])
 def start(message):
     if message.text == '/reg':
+        bot.send_message(message.from_user.id, 'Добро пожаловать! Этот бот для создания резюме. Чтобы собрать резюме нам необходимо заполнить сдежующие обязательные поля:')
         bot.send_message(message.from_user.id, 'Как тебя зовут?')
         bot.register_next_step_handler(message, get_name)
     else:
         bot.send_message(message.from_user.id, 'Давай зарегестрируемся с помощью команды /reg')
-        
+
 def get_name(message):
     global name
     name = message.text
@@ -46,25 +31,32 @@ def get_surname(message):
     bot.send_message(message.from_user.id, 'Сколько тебе лет?')
     bot.register_next_step_handler(message, get_age)
 
-
 def get_age(message):
     global age
-    age = int(message.text)
-    # bot.register_next_step_handler(message, button_quest)
-    keyboard = types.InlineKeyboardMarkup()
-    key_yes = types.InlineKeyboardButton(text='Да', callback_data='yes')
-    keyboard.add(key_yes);
-    key_no = types.InlineKeyboardButton(text='Нет', callback_data='no');
-    keyboard.add(key_no);
-    question = 'Тебе {age} лет, тебя зовут {name} {surname}?'
-    bot.send_message(message.from_user.id, text=question, reply_markup=keyboard)
-    if callback_data == 'yes':
-        bot.send_message(message.from_user.id, 'Запомню')
-    elif callback_data == 'no':
-        start()
+    try:
+        age = int(message.text)
+        keyboard = types.InlineKeyboardMarkup()
+        key_yes = types.InlineKeyboardButton(text='Да', callback_data='yes')
+        key_no = types.InlineKeyboardButton(text='Нет', callback_data='no')
+        keyboard.add(key_yes, key_no)
+        question = f'Тебе {age} лет, тебя зовут {name} {surname}?'
+        bot.send_message(message.from_user.id, text=question, reply_markup=keyboard)
+    except ValueError:
+        bot.send_message(message.from_user.id, 'Пожалуйста, введите возраст цифрами.')
 
-# @bot.message_handler(commands=['button'])
-# def button_quest(message):
-#
+@bot.callback_query_handler(func=lambda call: True)
+def question(call):
+    if call.data == 'yes':
+        bot.register_next_step_handler(message, get_photo)
+    elif call.data == 'no':
+        bot.send_message(message, 'Давай начнем заново.')
+        start(call.data)
+
+@bot.message_handler(content_types=['photo'])
+def get_photo(message):
+    global photo_us
+    photo = max(message.photo, key=lambda x: x.height)
+    print(photo.file_id)
+
 
 bot.polling(non_stop=True, interval=0)
